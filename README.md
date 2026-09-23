@@ -1,156 +1,86 @@
-\# IntelliSched AI
+# IntelliSched AI
 
+> **IntelliSched AI: An Explainable AI-Powered Department Timetable Optimizer with Dynamic Rescheduling and Constraint-Based Scheduling for MCA Department**
 
+---
 
-\## Project Title
+## 📌 Project Overview
+IntelliSched AI is an academic project developed for the MCA Department. In most academic institutions, timetable preparation is performed manually—a tedious, error-prone trial-and-error process prone to faculty clashes, room-capacity conflicts, and suboptimal class distributions.
 
+IntelliSched AI automates timetable preparation using **Constraint Satisfaction Problem (CSP)** techniques, featuring:
+- **Zero-Conflict Timetable Generation**: Strictly satisfies all hard constraints (faculty clashes, room double-booking, group overlap, room capacities, availability).
+- **Soft Constraint Optimization**: Minimizes faculty and student idle gaps, balances daily course loads, and respects faculty time preferences.
+- **Explainable AI (XAI)**: Provides plain-English explanations for why a schedule is valid, why a particular slot was chosen, or why a slot could not be assigned.
+- **Dynamic Rescheduling**: Performs localized constraint repair when unforeseen events occur (e.g., faculty absence, room maintenance) without recalculating the entire timetable.
 
+---
 
-IntelliSched AI: An Explainable AI-Powered Department Timetable Optimizer with Dynamic Rescheduling and Constraint-Based Scheduling for MCA Department
+## 🛠️ Technology Stack
+- **Frontend**: React (Vite), Bootstrap 5, Axios, React Router Dom
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (via Mongoose ODM)
+- **Scheduling Intelligence**: Algorithmic CSP Engine (Backtracking + Forward Checking + MRV Heuristic)
 
+---
 
-
-\## Project Description
-
-
-
-IntelliSched AI is an intelligent timetable scheduling system designed for the MCA Department.
-
-
-
-The system uses Constraint Satisfaction Problem (CSP) based scheduling along with soft-constraint optimization to generate feasible and optimized department timetables.
-
-
-
-It considers faculty availability, subject requirements, room availability, workload distribution, faculty preferences, and other scheduling constraints.
-
-
-
-The system also supports explainable scheduling and dynamic rescheduling when changes such as faculty leave occur.
-
-
-
-\## Key Features
-
-
-
-\- Constraint-based timetable generation
-
-\- Hard and soft constraint handling
-
-\- Faculty availability and preferences
-
-\- Workload balancing
-
-\- Room and laboratory allocation
-
-\- Conflict detection
-
-\- Explainable scheduling decisions
-
-\- Dynamic/partial timetable rescheduling
-
-\- Timetable quality evaluation
-
-
-
-\## Technology Stack
-
-
-
-\### Frontend
-
-\- React
-
-\- Vite
-
-\- Bootstrap
-
-\- Axios
-
-
-
-\### Backend
-
-\- Node.js
-
-\- Express.js
-
-
-
-\### Database
-
-\- MongoDB
-
-
-
-\### Scheduling Engine
-
-\- Python
-
-\- Constraint-based scheduling
-
-
-
-\### Version Control
-
-\- Git
-
-\- GitHub
-
-
-
-\## Project Architecture
-
-
-
+## 🏛️ Project Architecture
+```text
 React Frontend
-
-&#x20;       |
-
-&#x20;       v
-
+      │
+      ▼
 Node.js + Express Backend
-
-&#x20;       |
-
-&#x20;       +------> MongoDB
-
-&#x20;       |
-
-&#x20;       v
-
-Python Scheduling Engine
-
-&#x20;       |
-
-&#x20;       v
-
-Optimized Timetable
-
-&#x20;       |
-
-&#x20;       v
-
+      │
+      ├───────► MongoDB (Data Layer)
+      │
+      ▼
+CSP Scheduling & Explainability Engine
+      │
+      ▼
+Optimized Timetable & XAI Audit Logs
+      │
+      ▼
 React Frontend
+```
 
+---
 
+## 🚀 Getting Started
 
-\## Project Scope
+### Prerequisites
+- Node.js (v18+)
+- npm (v9+)
+- MongoDB (Local instance or MongoDB Atlas URI)
 
+### Quick Setup
 
+#### 1. Backend Setup
+```bash
+cd server
+cp .env.example .env
+npm install
+npm run dev
+```
 
-The initial implementation focuses on timetable optimization for the MCA Department.
+#### 2. Frontend Setup
+```bash
+cd client
+npm install
+npm run dev
+```
 
+---
 
+## 📁 Project Structure
+```text
+PROJECT/
+├── client/          # React + Vite Frontend
+├── server/          # Node.js + Express Backend & CSP Engine
+├── .gitignore       # Git ignore rules
+└── README.md        # Project documentation
+```
 
-The architecture can later be extended to support other departments.
+---
 
-
-
-\## Project Status
-
-
-
-Development starting.
-
+## 🎯 Current Project Status
+- **Phase 1 Completed**: Project setup, React Vite client, Express backend with health API.
+- **Phase 2 In Progress**: Database models & Realistic MCA Seed Dataset.

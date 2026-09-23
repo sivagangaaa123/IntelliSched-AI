@@ -1,0 +1,40 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --primary-color: #1e3a8a;
+  --secondary-color: #0d9488;
+  --accent-color: #f59e0b;
+  --bg-light: #f8fafc;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-light);
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.badge-csp {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+}
