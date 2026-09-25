@@ -5,9 +5,16 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed": "node src/seed/seed.js"
   },
-  "keywords": ["csp", "timetable", "scheduler", "explainable-ai", "mca"],
+  "keywords": [
+    "csp",
+    "timetable",
+    "scheduler",
+    "explainable-ai",
+    "mca"
+  ],
   "author": "MCA Department",
   "license": "ISC",
   "dependencies": {
@@ -17,6 +24,7 @@
     "mongoose": "^8.3.4"
   },
   "devDependencies": {
+    "mongodb-memory-server": "^11.3.0",
     "nodemon": "^3.1.0"
   }
 }
