@@ -8,6 +8,8 @@ import DataTables from './components/DataTables';
 import RescheduleModal from './components/RescheduleModal';
 import ExplainSlotModal from './components/ExplainSlotModal';
 import Login from './components/Login';
+import DashboardCharts from './components/DashboardCharts';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
   const [activeTab, setActiveTab] = useState('timetable');
@@ -137,10 +139,15 @@ function App() {
 
         {/* Global KPI Metrics Header */}
         {timetable && (
-          <MetricsHeader
-            timetable={timetable}
-            onOpenReschedule={() => setIsRescheduleOpen(true)}
-          />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            <MetricsHeader
+              timetable={timetable}
+              onOpenReschedule={() => setIsRescheduleOpen(true)}
+            />
+            {activeTab === 'timetable' && (
+              <DashboardCharts timetable={timetable} facultyList={facultyList} />
+            )}
+          </motion.div>
         )}
 
         {/* If no timetable generated yet */}
@@ -175,34 +182,42 @@ function App() {
           </div>
         )}
 
-        {/* TAB 1: Timetable Grid */}
-        {activeTab === 'timetable' && timetable && (
-          <TimetableGrid
-            timetable={timetable}
-            facultyList={facultyList}
-            classrooms={classrooms}
-            studentGroups={studentGroups}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {/* TAB 1: Timetable Grid */}
+          {activeTab === 'timetable' && timetable && (
+            <motion.div key="timetable" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+              <TimetableGrid
+                timetable={timetable}
+                facultyList={facultyList}
+                classrooms={classrooms}
+                studentGroups={studentGroups}
+              />
+            </motion.div>
+          )}
 
-        {/* TAB 2: Department Data Tables */}
-        {activeTab === 'data' && (
-          <DataTables
-            facultyList={facultyList}
-            courses={courses}
-            classrooms={classrooms}
-            studentGroups={studentGroups}
-            constraints={constraints}
-          />
-        )}
+          {/* TAB 2: Department Data Tables */}
+          {activeTab === 'data' && (
+            <motion.div key="data" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+              <DataTables
+                facultyList={facultyList}
+                courses={courses}
+                classrooms={classrooms}
+                studentGroups={studentGroups}
+                constraints={constraints}
+              />
+            </motion.div>
+          )}
 
-        {/* TAB 3: XAI "Why-Not?" Inspector */}
-        {activeTab === 'inspector' && (
-          <ExplainSlotModal
-            courses={courses}
-            classrooms={classrooms}
-          />
-        )}
+          {/* TAB 3: XAI "Why-Not?" Inspector */}
+          {activeTab === 'inspector' && (
+            <motion.div key="inspector" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+              <ExplainSlotModal
+                courses={courses}
+                classrooms={classrooms}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Dynamic Reschedule Modal */}
