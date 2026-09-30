@@ -1,132 +1,69 @@
-# IntelliSched AI
+# 🎓 IntelliSched AI
 
-> **IntelliSched AI: An Explainable AI-Powered Department Timetable Optimizer with Dynamic Rescheduling and Constraint-Based Scheduling for MCA Department**
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![React](https://img.shields.io/badge/React-18.x-61DAFB?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-24.x-339933?logo=nodedotjs)
+![MongoDB](https://img.shields.io/badge/MongoDB-In--Memory-47A248?logo=mongodb)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
----
+An **Explainable AI-powered Timetable Optimizer** designed specifically for Academic Departments (MCA/B.Tech). This system solves the NP-hard problem of academic scheduling using a robust **Constraint Satisfaction Problem (CSP)** engine built on the MERN stack.
 
-## 📌 Project Overview
-IntelliSched AI is an academic project developed for the MCA Department. In most academic institutions, timetable preparation is performed manually—a tedious, error-prone trial-and-error process prone to faculty clashes, room-capacity conflicts, and suboptimal class distributions.
+## ✨ Key Features
 
-IntelliSched AI automates timetable preparation using **Constraint Satisfaction Problem (CSP)** techniques, featuring:
-- **Zero-Conflict Timetable Generation**: Strictly satisfies all hard constraints (faculty clashes, room double-booking, group overlap, room capacities, availability).
-- **Soft Constraint Optimization**: Minimizes faculty and student idle gaps, balances daily course loads, and respects faculty time preferences.
-- **Explainable AI (XAI)**: Provides plain-English explanations for why a schedule is valid, why a particular slot was chosen, or why a slot could not be assigned.
-- **Dynamic Rescheduling**: Performs localized constraint repair when unforeseen events occur (e.g., faculty absence, room maintenance) without recalculating the entire timetable.
-
----
+- 🧠 **AI-Powered CSP Engine**: Automatically generates 100% clash-free schedules prioritizing Labs, Electives, and Theory courses using Backtracking with MRV heuristics.
+- 💬 **Explainable AI (XAI)**: Includes a "Why-Not?" Inspector that provides human-readable audit logs explaining exactly *why* a particular course couldn't be scheduled at a specific time.
+- ⚡ **Dynamic Rescheduler**: If a faculty member is absent, the system performs a localized repair (patching only the affected slot) without destroying the rest of the schedule.
+- 🔒 **Secure Role-Based Access**: JWT-secured login system (`admin@mca.edu` / `admin`).
+- 📊 **Visual Analytics Dashboard**: Interactive charts (Recharts) mapping session distribution and faculty workloads.
+- 📄 **Professional PDF Export**: One-click generation of professional, color-coded timetable PDFs complete with metric summaries and XAI audits using `jsPDF`.
 
 ## 🛠️ Technology Stack
-- **Frontend**: React (Vite), Bootstrap 5, Bootstrap Icons, Axios
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB (via Mongoose ODM) with automatic in-memory fallback for offline viva demonstrations
-- **Scheduling Intelligence**: Algorithmic CSP Engine (Backtracking + Forward Checking + MRV Heuristic)
 
----
+- **Frontend**: React 18, Vite, Bootstrap 5, Framer Motion (Animations), Recharts.
+- **Backend**: Node.js, Express.js.
+- **Database**: MongoDB (with `mongodb-memory-server` for seamless zero-setup testing).
+- **Core Algorithm**: Backtracking Constraint Satisfaction Problem (CSP) + Local Search Repair.
 
-## 🏛️ Project Architecture
-```text
-React Frontend (Timetable Grid & Department Tables)
-      │
-      ▼
-Node.js + Express Backend
-      │
-      ├───────► MongoDB (Data Layer: Faculty, Courses, Rooms, Groups, Constraints)
-      │
-      ▼
-CSP Scheduling & Explainability Engine
-      │
-      ▼
-Optimized Timetable & XAI Audit Logs
-      │
-      ▼
-React Frontend
+## 🚀 Quick Start Guide
+
+No local database setup is required! The app uses an in-memory MongoDB that automatically seeds a realistic MCA department dataset on the first boot.
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/sivagangaaa123/IntelliSched-AI.git
+cd IntelliSched-AI
 ```
 
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v18+)
-- npm (v9+)
-- MongoDB (Optional: The application automatically connects to local MongoDB or MongoDB Atlas URI from `.env`, with an automatic offline fallback for instant academic presentation!)
-
-### Quick Setup
-
-#### 1. Backend Setup
+### 2. Start the Backend Server
 ```bash
 cd server
-cp .env.example .env
 npm install
-npm run seed     # (Optional: Server auto-seeds on first boot!)
-npm run dev
+npm start
 ```
+*(The backend will run on `http://localhost:5000`. On first boot, it will auto-seed 10 Faculty, 14 Courses, 7 Rooms, and 5 Student Groups).*
 
-#### 2. Frontend Setup
+### 3. Start the Frontend Client
+Open a new terminal window:
 ```bash
 cd client
 npm install
 npm run dev
 ```
+*(The frontend will run on `http://localhost:5173`)*
 
-Open your browser to: **`http://localhost:5173`**
+### 4. Default Credentials
+- **Email**: `admin@mca.edu`
+- **Password**: `admin`
 
----
-
-## 📡 REST API Endpoints
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | System status, database health & collection counts |
-| `GET` | `/api/faculty` | List all 10 MCA faculty members with leave constraints |
-| `GET` | `/api/courses` | List all 14 MCA courses (Theory, Labs, Electives, Seminar) |
-| `GET` | `/api/classrooms` | List all 7 classrooms & labs with seating capacity |
-| `GET` | `/api/student-groups` | List all student batches & elective sub-groups |
-| `GET` | `/api/time-slots` | List all 30 academic timetable periods (5 days $\times$ 6 periods) |
-| `GET` | `/api/constraints` | Get active Hard & Soft constraint rules |
-| `GET` | `/api/timetable/active` | Fetch current active timetable grid with populated entities |
-| `POST` | `/api/timetable/generate` | Solve CSP and generate zero-clash timetable |
-| `POST` | `/api/timetable/reschedule` | Dynamically repair schedule on faculty absence with XAI log |
-| `POST` | `/api/timetable/explain-slot`| "Why-Not" conflict diagnostician explaining slot validity |
-
----
-
-## 📁 Project Structure
-```text
-PROJECT/
-├── client/                     # React + Vite Frontend
-│   ├── src/
-│   │   ├── components/         # Navbar, TimetableGrid, DataTables, RescheduleModal, ExplainSlotModal
-│   │   ├── App.jsx             # Main Application Controller
-│   │   ├── index.css           # Academic Theme & Custom Badges
-│   │   └── main.jsx
-│   ├── package.json
-│   └── vite.config.js
-├── server/                     # Node.js + Express Backend & CSP Engine
-│   ├── src/
-│   │   ├── config/             # Database connection & fallback
-│   │   ├── engine/             # CSP Solver, Constraints & Explainability
-│   │   │   ├── cspSolver.js    # Backtracking + Forward Checking + MRV Heuristic
-│   │   │   ├── constraints.js  # Hard and Soft constraint validators
-│   │   │   ├── explainability.js # Plain-English decision rationale generator
-│   │   │   └── rescheduler.js  # Dynamic timetable repair logic
-│   │   ├── models/             # Mongoose Schemas (Faculty, Course, Classroom, Group, TimeSlot, Timetable)
-│   │   ├── routes/             # REST API Routes
-│   │   ├── seed/               # Realistic MCA Department Seed Dataset
-│   │   └── server.js           # Express App Entry Point
-│   └── package.json
-├── .gitignore                  # Git ignore rules
-└── README.md                   # Project documentation
+## 🧪 Running Tests
+The backend includes a comprehensive 33-suite automated test testing the CSP engine, Rescheduler, XAI audits, and Seed integrity.
+```bash
+cd server
+npm test
 ```
 
----
+## 📚 Documentation
+For students preparing for a project defense or viva, check out the [Viva & Project Defense Guide](docs/VIVA_DEFENSE_GUIDE.md).
 
-## 🎯 Current Project Status
-- ✅ **Phase 1 Completed**: Project setup, React Vite client, Express backend with health API.
-- ✅ **Phase 2 Completed**: Mongoose models, realistic MCA seed dataset, department CRUD APIs.
-- ✅ **Core Timetable Tasks Completed**:
-  - Algorithmic CSP Engine (Backtracking, Forward Checking, MRV).
-  - Explainable AI (XAI) rationale generator.
-  - Dynamic Rescheduling on unexpected faculty absence.
-  - Interactive React Timetable Grid (filterable by Semester, Group, Faculty, Room).
-  - Department Data Tables viewer.
-  - "Why-Not" Constraint Diagnostic Inspector.
+---
+*Developed as an MCA Final Year Project emphasizing algorithmic optimization and Explainable AI.*
