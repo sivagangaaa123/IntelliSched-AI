@@ -13,6 +13,7 @@ const StudentGroup = require('../models/StudentGroup');
 const Course = require('../models/Course');
 const TimeSlot = require('../models/TimeSlot');
 const ConstraintConfig = require('../models/ConstraintConfig');
+const User = require('../models/User');
 
 // Data sources
 const facultyData = require('./facultyData');
@@ -42,7 +43,8 @@ const seedDatabase = async (closeConnection = true) => {
       StudentGroup.deleteMany({}),
       Course.deleteMany({}),
       TimeSlot.deleteMany({}),
-      ConstraintConfig.deleteMany({})
+      ConstraintConfig.deleteMany({}),
+      User.deleteMany({})
     ]);
 
     // 2. Insert Time Slots (30 slots: 5 days x 6 periods)
@@ -120,6 +122,15 @@ const seedDatabase = async (closeConnection = true) => {
     // 7. Insert Constraints Configuration
     const insertedConfig = await ConstraintConfig.create(constraintData);
     console.log(`⚙️  Constraint Configuration initialized: '${insertedConfig.name}'`);
+
+    // 8. Create Admin User
+    const adminUser = await User.create({
+      name: 'Department Admin',
+      email: 'admin@mca.edu',
+      password: 'admin',
+      role: 'admin'
+    });
+    console.log(`🔐 Admin user created: ${adminUser.email} / admin`);
 
     console.log('=====================================================');
     console.log('✅ Database seeded successfully!');

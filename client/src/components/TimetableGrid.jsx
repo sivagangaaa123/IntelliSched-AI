@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { generateTimetablePDF, printTimetable } from '../utils/pdfExport';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const PERIODS = [
@@ -144,8 +145,8 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
           </select>
         </div>
 
-        {/* Reset Filters */}
-        <div className="col-auto ms-auto">
+        {/* Reset Filters & Export Buttons */}
+        <div className="col-auto ms-auto d-flex gap-2">
           <button
             className="btn btn-sm btn-outline-secondary"
             onClick={() => {
@@ -157,6 +158,28 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
             title="Reset all filters"
           >
             <i className="bi bi-x-circle me-1"></i> Reset
+          </button>
+          <button
+            className="btn btn-sm btn-outline-danger"
+            onClick={() => {
+              const filterLabel = [
+                selectedSemester !== 'ALL' ? `Sem ${selectedSemester}` : '',
+                selectedGroup !== 'ALL' ? selectedGroup : '',
+                selectedFaculty !== 'ALL' ? selectedFaculty : '',
+                selectedRoom !== 'ALL' ? selectedRoom : '',
+              ].filter(Boolean).join(' | ') || 'All Filters';
+              generateTimetablePDF(timetable, { filterLabel, filteredGrid });
+            }}
+            title="Download timetable as PDF"
+          >
+            <i className="bi bi-file-earmark-pdf me-1"></i> Download PDF
+          </button>
+          <button
+            className="btn btn-sm btn-outline-dark"
+            onClick={printTimetable}
+            title="Print timetable via browser"
+          >
+            <i className="bi bi-printer me-1"></i> Print
           </button>
         </div>
       </div>

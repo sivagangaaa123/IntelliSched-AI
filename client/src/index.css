@@ -38,3 +38,38 @@ body {
   background: linear-gradient(135deg, #1e3a8a, #3b82f6);
   color: white;
 }
+
+/* ── Print Styles ──────────────────────────────────────────────────── */
+@media print {
+  /* Hide non-essential UI elements */
+  .navbar, footer, .no-print,
+  .btn, select, .alert, .form-select {
+    display: none !important;
+  }
+
+  /* Full-width layout */
+  body { background: white !important; }
+  .container-fluid { padding: 0 !important; }
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    transform: none !important;
+    break-inside: avoid;
+  }
+
+  /* Optimize table for print */
+  .table {
+    font-size: 9px !important;
+    border-collapse: collapse !important;
+  }
+  .table th, .table td {
+    padding: 4px !important;
+    border: 1px solid #333 !important;
+  }
+
+  /* Force colors in print */
+  .bg-success, .bg-primary, .bg-warning, .bg-info {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

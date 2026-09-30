@@ -7,6 +7,7 @@ import TimetableGrid from './components/TimetableGrid';
 import DataTables from './components/DataTables';
 import RescheduleModal from './components/RescheduleModal';
 import ExplainSlotModal from './components/ExplainSlotModal';
+import Login from './components/Login';
 
 function App() {
   const [activeTab, setActiveTab] = useState('timetable');
@@ -21,6 +22,10 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('intellisched_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   // Load all initial department data and active timetable
   const fetchAllData = async () => {
@@ -84,6 +89,27 @@ function App() {
     }
   };
 
+  const handleLoginSuccess = (userData) => {
+    localStorage.setItem('intellisched_user', JSON.stringify(userData));
+    axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('intellisched_user');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+  };
+
+  // If user is already logged in, set default header
+  if (user && user.token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+  }
+
+  if (!user) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
       {/* Top Navbar */}
@@ -93,6 +119,8 @@ function App() {
         onGenerate={handleGenerateTimetable}
         isGenerating={isGenerating}
         timetableStatus={timetable ? 'Active' : 'Empty'}
+        onLogout={handleLogout}
+        user={user}
       />
 
       <div className="container-fluid px-4 py-3 flex-grow-1">

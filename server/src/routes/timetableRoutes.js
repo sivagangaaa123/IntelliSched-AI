@@ -7,11 +7,10 @@ const Classroom = require('../models/Classroom');
 const StudentGroup = require('../models/StudentGroup');
 const TimeSlot = require('../models/TimeSlot');
 const ConstraintConfig = require('../models/ConstraintConfig');
-const Timetable = require('../models/Timetable');
-
 const CSPSolver = require('../engine/cspSolver');
 const DynamicRescheduler = require('../engine/rescheduler');
 const { explainSlotRejection } = require('../engine/explainability');
+const { protect } = require('../middleware/auth');
 
 // Helper to populate timetable entries
 const populateTimetable = (query) => {
@@ -50,7 +49,7 @@ router.get('/active', async (req, res) => {
 });
 
 // POST /api/timetable/generate - Generate timetable using CSP Engine
-router.post('/generate', async (req, res) => {
+router.post('/generate', protect, async (req, res) => {
   try {
     console.log('⚡ Received request to generate timetable via CSP...');
 
@@ -136,7 +135,7 @@ router.post('/generate', async (req, res) => {
 });
 
 // POST /api/timetable/reschedule - Dynamically reschedule on faculty absence
-router.post('/reschedule', async (req, res) => {
+router.post('/reschedule', protect, async (req, res) => {
   try {
     const { facultyId, day, period, reason } = req.body;
 

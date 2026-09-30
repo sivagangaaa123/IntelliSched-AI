@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Navbar({ activeTab, setActiveTab, onGenerate, isGenerating, timetableStatus }) {
+function Navbar({ activeTab, setActiveTab, onGenerate, isGenerating, timetableStatus, onLogout, user }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark py-2 shadow-sm sticky-top">
       <div className="container-fluid px-4">
@@ -43,6 +43,9 @@ function Navbar({ activeTab, setActiveTab, onGenerate, isGenerating, timetableSt
           </ul>
 
           <div className="border-start border-secondary ps-3 d-flex align-items-center gap-2">
+            <span className="text-light small d-none d-md-inline me-2">
+              <i className="bi bi-person-circle me-1"></i> {user?.name}
+            </span>
             <button
               className="btn btn-sm btn-success d-flex align-items-center gap-1 shadow-sm px-3"
               onClick={onGenerate}
@@ -59,6 +62,13 @@ function Navbar({ activeTab, setActiveTab, onGenerate, isGenerating, timetableSt
                   <span>Generate Timetable</span>
                 </>
               )}
+            </button>
+            <button 
+              className="btn btn-sm btn-outline-danger ms-2"
+              onClick={onLogout}
+              title="Logout"
+            >
+              <i className="bi bi-box-arrow-right"></i>
             </button>
           </div>
         </div>

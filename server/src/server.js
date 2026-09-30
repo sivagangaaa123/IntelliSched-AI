@@ -11,6 +11,7 @@ const studentGroupRoutes = require('./routes/studentGroupRoutes');
 const timeSlotRoutes = require('./routes/timeSlotRoutes');
 const constraintRoutes = require('./routes/constraintRoutes');
 const timetableRoutes = require('./routes/timetableRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Models & Seeder
 const Faculty = require('./models/Faculty');
@@ -106,6 +107,7 @@ app.use('/api/student-groups', studentGroupRoutes);
 app.use('/api/time-slots', timeSlotRoutes);
 app.use('/api/constraints', constraintRoutes);
 app.use('/api/timetable', timetableRoutes);
+app.use('/api/auth', authRoutes);
 
 // Centralized Error Handler
 app.use((err, req, res, next) => {
