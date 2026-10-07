@@ -7,6 +7,7 @@ const Classroom = require('../models/Classroom');
 const StudentGroup = require('../models/StudentGroup');
 const TimeSlot = require('../models/TimeSlot');
 const ConstraintConfig = require('../models/ConstraintConfig');
+const Timetable = require('../models/Timetable');
 const CSPSolver = require('../engine/cspSolver');
 const DynamicRescheduler = require('../engine/rescheduler');
 const { explainSlotRejection } = require('../engine/explainability');
