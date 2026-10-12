@@ -28,9 +28,12 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
       const room = entry.classroom || {};
       const group = entry.studentGroup || {};
 
-      // Semester Filter
-      if (selectedSemester !== 'ALL' && course.semester !== Number(selectedSemester)) {
-        return false;
+      // Semester Filter (Checks course.semester or studentGroup.semester)
+      if (selectedSemester !== 'ALL') {
+        const sem = course.semester || group.semester;
+        if (sem !== Number(selectedSemester)) {
+          return false;
+        }
       }
 
       // Student Group Filter

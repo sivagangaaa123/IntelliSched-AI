@@ -16,10 +16,10 @@ const { protect } = require('../middleware/auth');
 // Helper to populate timetable entries
 const populateTimetable = (query) => {
   return query
-    .populate('grid.course', 'courseId courseCode name courseType weeklyPeriods requiredRoomType')
+    .populate('grid.course', 'courseId courseCode name courseType weeklyPeriods requiredRoomType semester')
     .populate('grid.faculty', 'facultyId name designation email department')
     .populate('grid.classroom', 'roomId name capacity type facilities')
-    .populate('grid.studentGroup', 'groupId name semester studentCount isElectiveGroup');
+    .populate('grid.studentGroup', 'groupId name semester studentCount isElectiveGroup parentGroupId');
 };
 
 // GET /api/timetable/active - Fetch current active timetable
@@ -110,7 +110,9 @@ router.post('/generate', protect, async (req, res) => {
         course: entry.course,
         faculty: entry.faculty,
         classroom: entry.classroom,
-        studentGroup: entry.studentGroup
+        studentGroup: entry.studentGroup,
+        isElectiveGroup: entry.isElectiveGroup || false,
+        parentGroupId: entry.parentGroupId || null
       })),
       metrics: result.metrics,
       explanation: result.explanation
@@ -204,7 +206,9 @@ router.post('/reschedule', protect, async (req, res) => {
         course: entry.course._id || entry.course,
         faculty: entry.faculty._id || entry.faculty,
         classroom: entry.classroom._id || entry.classroom,
-        studentGroup: entry.studentGroup._id || entry.studentGroup
+        studentGroup: entry.studentGroup._id || entry.studentGroup,
+        isElectiveGroup: entry.isElectiveGroup || false,
+        parentGroupId: entry.parentGroupId || null
       }));
 
       await timetable.save();
@@ -244,7 +248,7 @@ router.post('/explain-slot', async (req, res) => {
     const [course, classroom, activeTimetable] = await Promise.all([
       Course.findOne(courseQuery).populate('faculty').populate('studentGroup'),
       Classroom.findOne(roomQuery),
-      Timetable.findOne({ status: 'active' }).sort({ updatedAt: -1 })
+      populateTimetable(Timetable.findOne({ status: 'active' }).sort({ updatedAt: -1 }))
     ]);
 
     if (!course || !classroom) {

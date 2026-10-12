@@ -30,37 +30,44 @@ function isCapacitySufficient(studentGroup, classroom) {
   return classroom.capacity >= studentGroup.studentCount;
 }
 
+// Helper to safely extract String ID from an ObjectId, String, or Populated Document
+function extractId(val) {
+  if (!val) return '';
+  return (val._id || val).toString();
+}
+
 // Check for faculty clash at (day, period) in the current partial schedule
 function hasFacultyClash(schedule, facultyId, day, period) {
-  const fId = facultyId.toString();
+  const fId = extractId(facultyId);
   return schedule.some(entry => 
     entry.day === day && 
     entry.period === period && 
-    entry.faculty.toString() === fId
+    extractId(entry.faculty) === fId
   );
 }
 
 // Check for classroom clash at (day, period) in the current partial schedule
 function hasClassroomClash(schedule, classroomId, day, period) {
-  const cId = classroomId.toString();
+  const cId = extractId(classroomId);
   return schedule.some(entry => 
     entry.day === day && 
     entry.period === period && 
-    entry.classroom.toString() === cId
+    extractId(entry.classroom) === cId
   );
 }
 
 // Check for student group clash at (day, period) in the current partial schedule
 // Note: Allows parallel scheduling for elective sub-groups that do not share students
 function hasStudentGroupClash(schedule, studentGroupId, isElectiveGroup, parentGroupId, day, period) {
-  const gId = studentGroupId.toString();
-  const pId = parentGroupId ? parentGroupId.toString() : null;
+  const gId = extractId(studentGroupId);
+  const pId = parentGroupId ? extractId(parentGroupId) : null;
 
   return schedule.some(entry => {
     if (entry.day !== day || entry.period !== period) return false;
 
-    const entryGroupId = entry.studentGroup.toString();
-    const entryParentId = entry.parentGroupId ? entry.parentGroupId.toString() : null;
+    const entryGroupId = extractId(entry.studentGroup);
+    const entryParentId = entry.parentGroupId ? extractId(entry.parentGroupId) : (entry.studentGroup?.parentGroupId ? extractId(entry.studentGroup.parentGroupId) : null);
+    const entryIsElective = entry.isElectiveGroup ?? entry.studentGroup?.isElectiveGroup ?? false;
 
     // 1. Direct same group conflict
     if (entryGroupId === gId) return true;
@@ -70,7 +77,7 @@ function hasStudentGroupClash(schedule, studentGroupId, isElectiveGroup, parentG
     if (entryParentId && entryParentId === gId) return true;
 
     // 3. Both are elective sub-groups of the same parent: ALLOWED in parallel!
-    if (isElectiveGroup && entry.isElectiveGroup && pId && entryParentId && pId === entryParentId) {
+    if (isElectiveGroup && entryIsElective && pId && entryParentId && pId === entryParentId) {
       return false; // Valid parallel elective!
     }
 

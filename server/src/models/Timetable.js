@@ -36,6 +36,15 @@ const TimetableGridEntrySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'StudentGroup',
     required: true
+  },
+  isElectiveGroup: {
+    type: Boolean,
+    default: false
+  },
+  parentGroupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'StudentGroup',
+    default: null
   }
 }, { _id: false });
 

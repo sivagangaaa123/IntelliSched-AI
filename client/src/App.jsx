@@ -25,8 +25,12 @@ function App() {
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const [notification, setNotification] = useState(null);
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('intellisched_user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem('intellisched_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
   });
 
   // Load all initial department data and active timetable
@@ -95,6 +99,7 @@ function App() {
     localStorage.setItem('intellisched_user', JSON.stringify(userData));
     axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
     setUser(userData);
+    fetchAllData();
   };
 
   const handleLogout = () => {
@@ -103,7 +108,7 @@ function App() {
     setUser(null);
   };
 
-  // If user is already logged in, set default header
+  // If user is already logged in, set default authorization header
   if (user && user.token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
   }

@@ -18,7 +18,26 @@ const connectDB = async () => {
 
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
-      mongodInstance = await MongoMemoryServer.create();
+      const os = require('os');
+      const path = require('path');
+      const fs = require('fs');
+
+      // Ensure a dedicated writable temp and cache directory on Windows
+      const safeTempDir = path.join(os.homedir(), '.cache', 'mongodb-temp');
+      const safeBinaryDir = path.join(os.homedir(), '.cache', 'mongodb-binaries');
+      if (!fs.existsSync(safeTempDir)) fs.mkdirSync(safeTempDir, { recursive: true });
+      if (!fs.existsSync(safeBinaryDir)) fs.mkdirSync(safeBinaryDir, { recursive: true });
+
+      if (process.platform === 'win32') {
+        process.env.TEMP = safeTempDir;
+        process.env.TMP = safeTempDir;
+      }
+
+      mongodInstance = await MongoMemoryServer.create({
+        binary: {
+          downloadDir: safeBinaryDir
+        }
+      });
       const memoryUri = mongodInstance.getUri();
 
       const conn = await mongoose.connect(memoryUri);

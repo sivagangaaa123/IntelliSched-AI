@@ -63,25 +63,34 @@ function explainSlotRejection({ course, faculty, studentGroup, classroom, timeSl
   
   // Enhance with context for faculty conflict
   if (check.constraint === 'facultyConflict') {
+    const fId = (faculty._id || faculty).toString();
     const clashingSession = currentSchedule.find(s => 
       s.day === timeSlot.day && 
       s.period === timeSlot.period && 
-      s.faculty.toString() === faculty._id.toString()
+      (s.faculty?._id || s.faculty).toString() === fId
     );
-    if (clashingSession && clashingSession.courseName) {
-      detailedExplanation = `${faculty.name} cannot teach ${course.name} on ${timeSlot.day} Period ${timeSlot.period} because they are already teaching '${clashingSession.courseName}' in room ${clashingSession.roomName || 'another room'}.`;
+    if (clashingSession) {
+      const cName = clashingSession.course?.name || clashingSession.courseName;
+      const rName = clashingSession.classroom?.name || clashingSession.classroomName || 'another room';
+      if (cName) {
+        detailedExplanation = `${faculty.name} cannot teach ${course.name} on ${timeSlot.day} Period ${timeSlot.period} because they are already teaching '${cName}' in room ${rName}.`;
+      }
     }
   }
 
   // Enhance with context for room conflict
   if (check.constraint === 'classroomConflict') {
+    const rId = (classroom._id || classroom).toString();
     const clashingSession = currentSchedule.find(s => 
       s.day === timeSlot.day && 
       s.period === timeSlot.period && 
-      s.classroom.toString() === classroom._id.toString()
+      (s.classroom?._id || s.classroom).toString() === rId
     );
-    if (clashingSession && clashingSession.courseName) {
-      detailedExplanation = `${classroom.name} cannot be assigned on ${timeSlot.day} Period ${timeSlot.period} because it is currently reserved for '${clashingSession.courseName}'.`;
+    if (clashingSession) {
+      const cName = clashingSession.course?.name || clashingSession.courseName;
+      if (cName) {
+        detailedExplanation = `${classroom.name} cannot be assigned on ${timeSlot.day} Period ${timeSlot.period} because it is currently reserved for '${cName}'.`;
+      }
     }
   }
 

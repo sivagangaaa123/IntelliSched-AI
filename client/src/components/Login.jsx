@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function Login({ onLoginSuccess }) {
-  const [email, setEmail] = useState('admin@mca.edu');
-  const [password, setPassword] = useState('admin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -124,12 +124,8 @@ function Login({ onLoginSuccess }) {
               </button>
             </form>
 
-            <div className="mt-5 pt-3">
-              <div className="p-3 bg-light rounded-3 border text-center text-secondary small">
-                <span className="d-block mb-1"><i className="bi bi-info-circle me-1"></i> <strong>Demo Access</strong></span>
-                Email: <span className="text-dark fw-medium">admin@mca.edu</span> <br/>
-                Password: <span className="text-dark fw-medium">admin</span>
-              </div>
+            <div className="mt-5 text-center text-muted small">
+              <span className="opacity-75">IntelliSched AI &copy; 2026 &bull; MCA Academic Portal</span>
             </div>
 
           </div>

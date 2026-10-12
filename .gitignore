@@ -40,3 +40,7 @@ yarn-error.log*
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Temp extraction folders
+tymtable/
+*.zip
