@@ -214,7 +214,7 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
                   if (p.num === 'LUNCH') {
                     return (
                       <td key={pIdx} className="bg-light text-muted small fw-semibold text-center" style={{ letterSpacing: '2px', writingMode: 'vertical-lr', textOrientation: 'upright' }}>
-                        RECESS
+                        BREAK
                       </td>
                     );
                   }
