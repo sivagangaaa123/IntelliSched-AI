@@ -242,6 +242,30 @@ async function runTests() {
   });
   assertEqual(groupClashes, 0, 'No student-group double-bookings (elective parallels allowed)');
 
+  // 2f. Verify all Lab courses are scheduled in 2 continuous periods
+  console.log('\n  ── 2f: Continuous 2-Period Lab Sessions Check ──');
+  const labEntries = result.grid.filter(e => {
+    const c = courseMap.get(e.course.toString());
+    return c && c.courseType === 'Lab';
+  });
+
+  const labSessionsByDay = new Map();
+  labEntries.forEach(e => {
+    const key = `${e.course.toString()}-${e.day}`;
+    if (!labSessionsByDay.has(key)) labSessionsByDay.set(key, []);
+    labSessionsByDay.get(key).push(e.period);
+  });
+
+  let nonContinuousLabs = 0;
+  for (const [key, periods] of labSessionsByDay.entries()) {
+    periods.sort((a, b) => a - b);
+    if (periods.length !== 2 || periods[1] !== periods[0] + 1) {
+      nonContinuousLabs++;
+      console.log(`    ⚠️  Lab not continuous: ${key} on periods [${periods.join(', ')}]`);
+    }
+  }
+  assertEqual(nonContinuousLabs, 0, 'All lab sessions are scheduled in 2 continuous periods');
+
   // ── TEST GROUP 3: Dynamic Rescheduler ───────────────────────────────────────
   console.log('\n━━━ TEST 3: Dynamic Rescheduler Verification ━━━');
 

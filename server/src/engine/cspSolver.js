@@ -1,7 +1,7 @@
 /**
  * IntelliSched AI - Core CSP Scheduling Engine
  * Implements Constraint Satisfaction Problem (CSP) with:
- * - Variable and Domain Formulation
+ * - Variable and Domain Formulation (Macro 2-Period Continuous Blocks for Practical Labs)
  * - Minimum Remaining Values (MRV) Heuristic
  * - Forward Checking (FC)
  * - Recursive Backtracking Search
@@ -26,7 +26,9 @@ class CSPSolver {
   }
 
   /**
-   * Decompose courses into individual period variables
+   * Decompose courses into variables:
+   * - Lab courses are decomposed into 2-period continuous blocks
+   * - Theory & activity courses are decomposed into single-period variables
    */
   generateVariables() {
     const variables = [];
@@ -40,15 +42,49 @@ class CSPSolver {
         (course.studentGroup._id || course.studentGroup).toString()
       );
 
-      for (let p = 1; p <= periods; p++) {
-        variables.push({
-          varId: `${course.courseCode}_S${p}`,
-          sessionIndex: p,
-          course,
-          faculty,
-          studentGroup,
-          requiredRoomType: course.requiredRoomType || 'Classroom'
-        });
+      if (course.courseType === 'Lab') {
+        // Schedule labs as 2-period continuous blocks
+        const numBlocks = Math.floor(periods / 2);
+        for (let b = 1; b <= numBlocks; b++) {
+          variables.push({
+            varId: `${course.courseCode}_B${b}`,
+            sessionIndex: b,
+            isBlock: true,
+            blockDuration: 2,
+            course,
+            faculty,
+            studentGroup,
+            requiredRoomType: course.requiredRoomType || 'Computer Lab'
+          });
+        }
+
+        // Any leftover odd single period (if applicable)
+        for (let p = numBlocks * 2 + 1; p <= periods; p++) {
+          variables.push({
+            varId: `${course.courseCode}_S${p}`,
+            sessionIndex: p,
+            isBlock: false,
+            blockDuration: 1,
+            course,
+            faculty,
+            studentGroup,
+            requiredRoomType: course.requiredRoomType || 'Computer Lab'
+          });
+        }
+      } else {
+        // Non-lab courses: standard single-period variables
+        for (let p = 1; p <= periods; p++) {
+          variables.push({
+            varId: `${course.courseCode}_S${p}`,
+            sessionIndex: p,
+            isBlock: false,
+            blockDuration: 1,
+            course,
+            faculty,
+            studentGroup,
+            requiredRoomType: course.requiredRoomType || 'Classroom'
+          });
+        }
       }
     });
 
@@ -70,24 +106,74 @@ class CSPSolver {
       return room.type === variable.requiredRoomType;
     });
 
-    this.timeSlots.forEach(slot => {
-      eligibleRooms.forEach(room => {
-        // Fast initial check on static availability
-        const facultyAvail = !variable.faculty.unavailableSlots?.some(
-          s => s.day === slot.day && s.period === slot.period
-        );
-        const roomAvail = !room.unavailableSlots?.some(
-          s => s.day === slot.day && s.period === slot.period
-        );
+    if (variable.isBlock) {
+      // Build slot lookup: day + period -> slot
+      const slotMap = new Map();
+      this.timeSlots.forEach(s => slotMap.set(`${s.day}_P${s.period}`, s));
 
-        if (facultyAvail && roomAvail) {
-          domain.push({
-            timeSlot: slot,
-            classroom: room
+      // Candidate 2-period consecutive pairs on the same day:
+      // Standard uninterrupted blocks: (1, 2), (3, 4), (5, 6)
+      // Fallback adjacent blocks: (2, 3), (4, 5)
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      const candidatePairs = [
+        [1, 2],
+        [3, 4],
+        [5, 6],
+        [2, 3],
+        [4, 5]
+      ];
+
+      days.forEach(day => {
+        candidatePairs.forEach(([p1, p2]) => {
+          const s1 = slotMap.get(`${day}_P${p1}`);
+          const s2 = slotMap.get(`${day}_P${p2}`);
+          if (!s1 || !s2) return;
+
+          eligibleRooms.forEach(room => {
+            const facultyAvail1 = !variable.faculty.unavailableSlots?.some(
+              s => s.day === s1.day && s.period === s1.period
+            );
+            const facultyAvail2 = !variable.faculty.unavailableSlots?.some(
+              s => s.day === s2.day && s.period === s2.period
+            );
+            const roomAvail1 = !room.unavailableSlots?.some(
+              s => s.day === s1.day && s.period === s1.period
+            );
+            const roomAvail2 = !room.unavailableSlots?.some(
+              s => s.day === s2.day && s.period === s2.period
+            );
+
+            if (facultyAvail1 && facultyAvail2 && roomAvail1 && roomAvail2) {
+              domain.push({
+                isBlock: true,
+                timeSlot: s1,
+                timeSlot2: s2,
+                classroom: room
+              });
+            }
           });
-        }
+        });
       });
-    });
+    } else {
+      this.timeSlots.forEach(slot => {
+        eligibleRooms.forEach(room => {
+          const facultyAvail = !variable.faculty.unavailableSlots?.some(
+            s => s.day === slot.day && s.period === slot.period
+          );
+          const roomAvail = !room.unavailableSlots?.some(
+            s => s.day === slot.day && s.period === slot.period
+          );
+
+          if (facultyAvail && roomAvail) {
+            domain.push({
+              isBlock: false,
+              timeSlot: slot,
+              classroom: room
+            });
+          }
+        });
+      });
+    }
 
     return domain;
   }
@@ -96,7 +182,54 @@ class CSPSolver {
    * Order domain values using Least Constraining Value / Soft preference heuristic
    */
   orderDomainValues(variable, domain, currentSchedule) {
-    // Sort values: prefer slots that distribute classes evenly and match faculty preference
+    if (variable.isBlock) {
+      return domain.sort((a, b) => {
+        let scoreA = 0;
+        let scoreB = 0;
+
+        // 1. Strongly prefer natural 2-period blocks: [1,2], [3,4], [5,6] over [2,3], [4,5]
+        const naturalStarts = [1, 3, 5];
+        if (naturalStarts.includes(a.timeSlot.period)) scoreA += 50;
+        if (naturalStarts.includes(b.timeSlot.period)) scoreB += 50;
+
+        // 2. Strongly discourage scheduling two blocks of the SAME lab course on the same day
+        const aSameCourseDayCount = currentSchedule.filter(
+          s => s.course.toString() === variable.course._id.toString() && s.day === a.timeSlot.day
+        ).length;
+        const bSameCourseDayCount = currentSchedule.filter(
+          s => s.course.toString() === variable.course._id.toString() && s.day === b.timeSlot.day
+        ).length;
+        scoreA -= aSameCourseDayCount * 100;
+        scoreB -= bSameCourseDayCount * 100;
+
+        // 3. Balance student group daily lab load: penalize placing more than 2 lab hours on the same day
+        const aGroupLabCount = currentSchedule.filter(
+          s => s.studentGroup.toString() === variable.studentGroup._id.toString() &&
+               s.day === a.timeSlot.day &&
+               s.classroom.toString() === a.classroom._id.toString()
+        ).length;
+        const bGroupLabCount = currentSchedule.filter(
+          s => s.studentGroup.toString() === variable.studentGroup._id.toString() &&
+               s.day === b.timeSlot.day &&
+               s.classroom.toString() === b.classroom._id.toString()
+        ).length;
+        scoreA -= aGroupLabCount * 25;
+        scoreB -= bGroupLabCount * 25;
+
+        // 4. Faculty preference
+        if (variable.faculty.preferences?.preferredTime === 'morning') {
+          if (a.timeSlot.period <= 3) scoreA += 10;
+          if (b.timeSlot.period <= 3) scoreB += 10;
+        } else if (variable.faculty.preferences?.preferredTime === 'afternoon') {
+          if (a.timeSlot.period >= 4) scoreA += 10;
+          if (b.timeSlot.period >= 4) scoreB += 10;
+        }
+
+        return scoreB - scoreA;
+      });
+    }
+
+    // Single-period variable ordering
     return domain.sort((a, b) => {
       let scoreA = 0;
       let scoreB = 0;
@@ -112,10 +245,10 @@ class CSPSolver {
 
       // Day distribution: penalize placing more than 2 sessions of same course on same day
       const aDayCount = currentSchedule.filter(
-        s => s.course._id.toString() === variable.course._id.toString() && s.day === a.timeSlot.day
+        s => s.course.toString() === variable.course._id.toString() && s.day === a.timeSlot.day
       ).length;
       const bDayCount = currentSchedule.filter(
-        s => s.course._id.toString() === variable.course._id.toString() && s.day === b.timeSlot.day
+        s => s.course.toString() === variable.course._id.toString() && s.day === b.timeSlot.day
       ).length;
 
       scoreA -= aDayCount * 10;
@@ -130,7 +263,7 @@ class CSPSolver {
    */
   solve() {
     const rawVariables = this.generateVariables();
-    console.log(`🧩 CSP Formulation: ${rawVariables.length} session variables to schedule across ${this.timeSlots.length} timeslots.`);
+    console.log(`🧩 CSP Formulation: ${rawVariables.length} session variables (with 2-period continuous lab blocks) to schedule.`);
 
     // Initialize domains
     const variableDomains = new Map();
@@ -178,19 +311,32 @@ class CSPSolver {
       const orderedValues = this.orderDomainValues(variable, domain, solution);
 
       for (const val of orderedValues) {
-        // Validate hard constraints against current partial schedule
-        const validation = validateHardConstraints({
-          course: variable.course,
-          faculty: variable.faculty,
-          studentGroup: variable.studentGroup,
-          classroom: val.classroom,
-          timeSlot: val.timeSlot,
-          currentSchedule: solution
-        });
+        if (variable.isBlock) {
+          // Validate both consecutive periods against current partial schedule
+          const validation1 = validateHardConstraints({
+            course: variable.course,
+            faculty: variable.faculty,
+            studentGroup: variable.studentGroup,
+            classroom: val.classroom,
+            timeSlot: val.timeSlot,
+            currentSchedule: solution
+          });
 
-        if (validation.valid) {
-          // Assign
-          const assignment = {
+          if (!validation1.valid) continue;
+
+          const validation2 = validateHardConstraints({
+            course: variable.course,
+            faculty: variable.faculty,
+            studentGroup: variable.studentGroup,
+            classroom: val.classroom,
+            timeSlot: val.timeSlot2,
+            currentSchedule: solution
+          });
+
+          if (!validation2.valid) continue;
+
+          // Both periods satisfied! Create continuous 2-period assignments
+          const assignment1 = {
             slot: val.timeSlot,
             day: val.timeSlot.day,
             period: val.timeSlot.period,
@@ -208,23 +354,59 @@ class CSPSolver {
             parentGroupId: variable.studentGroup.parentGroupId || null
           };
 
-          solution.push(assignment);
+          const assignment2 = {
+            slot: val.timeSlot2,
+            day: val.timeSlot2.day,
+            period: val.timeSlot2.period,
+            course: variable.course._id,
+            courseCode: variable.course.courseCode,
+            courseName: variable.course.name,
+            faculty: variable.faculty._id,
+            facultyName: variable.faculty.name,
+            classroom: val.classroom._id,
+            classroomName: val.classroom.name,
+            studentGroup: variable.studentGroup._id,
+            studentGroupName: variable.studentGroup.name,
+            isElectiveGroup: variable.studentGroup.isElectiveGroup || false,
+            electiveBucket: variable.studentGroup.electiveBucket || null,
+            parentGroupId: variable.studentGroup.parentGroupId || null
+          };
 
-          // Forward Checking: Ensure next variables still have at least 1 valid option
+          solution.push(assignment1);
+          solution.push(assignment2);
+
+          // Forward Checking: Ensure next variable still has at least 1 valid option
           let domainWipedOut = false;
           if (varIndex + 1 < sortedVariables.length) {
             const nextVar = sortedVariables[varIndex + 1];
             const nextDomain = variableDomains.get(nextVar.varId);
-            const hasValidOption = nextDomain.some(nextVal => 
-              validateHardConstraints({
+            const hasValidOption = nextDomain.some(nextVal => {
+              if (nextVar.isBlock) {
+                return validateHardConstraints({
+                  course: nextVar.course,
+                  faculty: nextVar.faculty,
+                  studentGroup: nextVar.studentGroup,
+                  classroom: nextVal.classroom,
+                  timeSlot: nextVal.timeSlot,
+                  currentSchedule: solution
+                }).valid && validateHardConstraints({
+                  course: nextVar.course,
+                  faculty: nextVar.faculty,
+                  studentGroup: nextVar.studentGroup,
+                  classroom: nextVal.classroom,
+                  timeSlot: nextVal.timeSlot2,
+                  currentSchedule: solution
+                }).valid;
+              }
+              return validateHardConstraints({
                 course: nextVar.course,
                 faculty: nextVar.faculty,
                 studentGroup: nextVar.studentGroup,
                 classroom: nextVal.classroom,
                 timeSlot: nextVal.timeSlot,
                 currentSchedule: solution
-              }).valid
-            );
+              }).valid;
+            });
             if (!hasValidOption) domainWipedOut = true;
           }
 
@@ -233,8 +415,84 @@ class CSPSolver {
             if (success) return true;
           }
 
-          // Backtrack
+          // Backtrack both periods
           solution.pop();
+          solution.pop();
+        } else {
+          // Standard single-period variable assignment
+          const validation = validateHardConstraints({
+            course: variable.course,
+            faculty: variable.faculty,
+            studentGroup: variable.studentGroup,
+            classroom: val.classroom,
+            timeSlot: val.timeSlot,
+            currentSchedule: solution
+          });
+
+          if (validation.valid) {
+            const assignment = {
+              slot: val.timeSlot,
+              day: val.timeSlot.day,
+              period: val.timeSlot.period,
+              course: variable.course._id,
+              courseCode: variable.course.courseCode,
+              courseName: variable.course.name,
+              faculty: variable.faculty._id,
+              facultyName: variable.faculty.name,
+              classroom: val.classroom._id,
+              classroomName: val.classroom.name,
+              studentGroup: variable.studentGroup._id,
+              studentGroupName: variable.studentGroup.name,
+              isElectiveGroup: variable.studentGroup.isElectiveGroup || false,
+              electiveBucket: variable.studentGroup.electiveBucket || null,
+              parentGroupId: variable.studentGroup.parentGroupId || null
+            };
+
+            solution.push(assignment);
+
+            // Forward Checking: Ensure next variable still has at least 1 valid option
+            let domainWipedOut = false;
+            if (varIndex + 1 < sortedVariables.length) {
+              const nextVar = sortedVariables[varIndex + 1];
+              const nextDomain = variableDomains.get(nextVar.varId);
+              const hasValidOption = nextDomain.some(nextVal => {
+                if (nextVar.isBlock) {
+                  return validateHardConstraints({
+                    course: nextVar.course,
+                    faculty: nextVar.faculty,
+                    studentGroup: nextVar.studentGroup,
+                    classroom: nextVal.classroom,
+                    timeSlot: nextVal.timeSlot,
+                    currentSchedule: solution
+                  }).valid && validateHardConstraints({
+                    course: nextVar.course,
+                    faculty: nextVar.faculty,
+                    studentGroup: nextVar.studentGroup,
+                    classroom: nextVal.classroom,
+                    timeSlot: nextVal.timeSlot2,
+                    currentSchedule: solution
+                  }).valid;
+                }
+                return validateHardConstraints({
+                  course: nextVar.course,
+                  faculty: nextVar.faculty,
+                  studentGroup: nextVar.studentGroup,
+                  classroom: nextVal.classroom,
+                  timeSlot: nextVal.timeSlot,
+                  currentSchedule: solution
+                }).valid;
+              });
+              if (!hasValidOption) domainWipedOut = true;
+            }
+
+            if (!domainWipedOut) {
+              const success = backtrack(varIndex + 1);
+              if (success) return true;
+            }
+
+            // Backtrack
+            solution.pop();
+          }
         }
       }
 

@@ -34,9 +34,9 @@ const classroomData = [
   {
     roomId: 'LAB-02',
     name: 'Network & Security Lab 2',
-    capacity: 40,
+    capacity: 60,
     type: 'Computer Lab',
-    facilities: ['40 Desktop PCs', 'Cisco Packet Tracer', 'Projector'],
+    facilities: ['60 Desktop PCs', 'Cisco Packet Tracer', 'Projector'],
     unavailableSlots: [
       {
         day: 'Friday',
