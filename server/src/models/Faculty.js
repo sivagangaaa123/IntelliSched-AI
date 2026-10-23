@@ -20,7 +20,7 @@ const FacultySchema = new mongoose.Schema({
   },
   designation: {
     type: String,
-    enum: ['Professor', 'Associate Professor', 'Assistant Professor', 'Lecturer', 'Guest Faculty'],
+    enum: ['Professor', 'Associate Professor', 'Assistant Professor', 'Associate Professor & HOD', 'Professor & HOD', 'Lecturer', 'Guest Faculty'],
     default: 'Assistant Professor'
   },
   email: {
@@ -46,7 +46,7 @@ const FacultySchema = new mongoose.Schema({
         {
           type: Number,
           min: 1,
-          max: 6
+          max: 8
         }
       ]
     }
@@ -62,7 +62,7 @@ const FacultySchema = new mongoose.Schema({
       period: {
         type: Number,
         min: 1,
-        max: 6,
+        max: 8,
         required: true
       },
       reason: {

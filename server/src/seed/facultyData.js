@@ -1,143 +1,136 @@
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-// Helper to generate full default availability (all 6 periods for all 5 days)
+// Helper to generate full default availability (all 7 periods for all 5 days)
 const defaultAvailability = () => days.map(day => ({
   day,
-  periods: [1, 2, 3, 4, 5, 6]
+  periods: [1, 2, 3, 4, 5, 6, 7]
 }));
 
 const facultyData = [
   {
     facultyId: 'FAC001',
-    name: 'Dr. Rajesh Kumar',
+    name: 'Dr. Shahna K U',
     department: 'MCA',
-    designation: 'Professor',
-    email: 'rajesh.kumar@mca.edu',
-    maxWeeklyHours: 12,
+    designation: 'Associate Professor & HOD',
+    email: 'shahna@fisat.ac.in',
+    maxWeeklyHours: 16,
     availability: defaultAvailability(),
     unavailableSlots: [
-      { day: 'Monday', period: 1, reason: 'Department HOD Council Meeting' },
-      { day: 'Wednesday', period: 4, reason: 'Academic Senate Duty' }
+      { day: 'Monday', period: 1, reason: 'Department HOD Council Meeting' }
     ],
     preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
   },
   {
     facultyId: 'FAC002',
-    name: 'Dr. Ananya Sharma',
-    department: 'MCA',
-    designation: 'Associate Professor',
-    email: 'ananya.sharma@mca.edu',
-    maxWeeklyHours: 16,
-    availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Wednesday', period: 3, reason: 'Research & Guidance Hour' }
-    ],
-    preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
-  },
-  {
-    facultyId: 'FAC003',
-    name: 'Prof. Vikram Nair',
-    department: 'MCA',
-    designation: 'Associate Professor',
-    email: 'vikram.nair@mca.edu',
-    maxWeeklyHours: 16,
-    availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Tuesday', period: 5, reason: 'Curriculum Revision Meeting' }
-    ],
-    preferences: { preferredTime: 'afternoon', maxConsecutivePeriods: 2 }
-  },
-  {
-    facultyId: 'FAC004',
-    name: 'Prof. Meera Menon',
+    name: 'Ms. Senu Abi',
     department: 'MCA',
     designation: 'Assistant Professor',
-    email: 'meera.menon@mca.edu',
+    email: 'senuabi@fisat.ac.in',
     maxWeeklyHours: 18,
     availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Thursday', period: 2, reason: 'Lab Inventory & Maintenance' }
-    ],
+    unavailableSlots: [],
     preferences: { preferredTime: 'any', maxConsecutivePeriods: 2 }
   },
   {
-    facultyId: 'FAC005',
-    name: 'Prof. Suresh Pillai',
+    facultyId: 'FAC003',
+    name: 'Ms. Anju L',
     department: 'MCA',
     designation: 'Assistant Professor',
-    email: 'suresh.pillai@mca.edu',
+    email: 'anjul@fisat.ac.in',
     maxWeeklyHours: 18,
     availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Friday', period: 4, reason: 'Student Mentorship Sessions' }
-    ],
+    unavailableSlots: [],
+    preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
+  },
+  {
+    facultyId: 'FAC004',
+    name: 'Ms. Joice T',
+    department: 'MCA',
+    designation: 'Assistant Professor',
+    email: 'joicet@fisat.ac.in',
+    maxWeeklyHours: 18,
+    availability: defaultAvailability(),
+    unavailableSlots: [],
+    preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
+  },
+  {
+    facultyId: 'FAC005',
+    name: 'Dr. Rose Mary Mathew',
+    department: 'MCA',
+    designation: 'Associate Professor',
+    email: 'rosemary@fisat.ac.in',
+    maxWeeklyHours: 16,
+    availability: defaultAvailability(),
+    unavailableSlots: [],
     preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
   },
   {
     facultyId: 'FAC006',
-    name: 'Dr. Kavitha Sundaram',
+    name: 'Dr. Santhosh Kottam',
     department: 'MCA',
-    designation: 'Assistant Professor',
-    email: 'kavitha.sundaram@mca.edu',
+    designation: 'Professor',
+    email: 'santhoshkottam@fisat.ac.in',
     maxWeeklyHours: 16,
     availability: defaultAvailability(),
     unavailableSlots: [
-      { day: 'Monday', period: 4, reason: 'Project Review Committee' }
+      { day: 'Friday', period: 7, reason: 'Research & Consultancy Duty' }
     ],
-    preferences: { preferredTime: 'afternoon', maxConsecutivePeriods: 2 }
+    preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
   },
   {
     facultyId: 'FAC007',
-    name: 'Prof. Arun Varma',
+    name: 'Dr. Rakhi Venugopal',
     department: 'MCA',
     designation: 'Assistant Professor',
-    email: 'arun.varma@mca.edu',
-    maxWeeklyHours: 18,
+    email: 'rakhiv@fisat.ac.in',
+    maxWeeklyHours: 16,
     availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Wednesday', period: 5, reason: 'Placement & Internship Coordination' }
-    ],
-    preferences: { preferredTime: 'any', maxConsecutivePeriods: 2 }
+    unavailableSlots: [],
+    preferences: { preferredTime: 'afternoon', maxConsecutivePeriods: 2 }
   },
   {
     facultyId: 'FAC008',
-    name: 'Prof. Deepa Thomas',
+    name: 'Ms. Sona Mary Louis',
     department: 'MCA',
     designation: 'Assistant Professor',
-    email: 'deepa.thomas@mca.edu',
+    email: 'sonamary@fisat.ac.in',
     maxWeeklyHours: 18,
     availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Tuesday', period: 3, reason: 'Exam Cell Duty' }
-    ],
-    preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
+    unavailableSlots: [],
+    preferences: { preferredTime: 'any', maxConsecutivePeriods: 2 }
   },
   {
     facultyId: 'FAC009',
-    name: 'Prof. Harish Mohan',
+    name: 'Dr. Sujesh P Lal',
     department: 'MCA',
-    designation: 'Lecturer',
-    email: 'harish.mohan@mca.edu',
-    maxWeeklyHours: 20,
+    designation: 'Associate Professor',
+    email: 'sujeshplal@fisat.ac.in',
+    maxWeeklyHours: 16,
     availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Thursday', period: 6, reason: 'Department Sports & Activities' }
-    ],
-    preferences: { preferredTime: 'afternoon', maxConsecutivePeriods: 3 }
+    unavailableSlots: [],
+    preferences: { preferredTime: 'any', maxConsecutivePeriods: 2 }
   },
   {
     facultyId: 'FAC010',
-    name: 'Dr. Pooja Hegde',
+    name: 'Dr. Deepa Mary Mathews',
     department: 'MCA',
-    designation: 'Guest Faculty',
-    email: 'pooja.hegde@mca.edu',
-    maxWeeklyHours: 10,
+    designation: 'Assistant Professor',
+    email: 'deepamary@fisat.ac.in',
+    maxWeeklyHours: 16,
     availability: defaultAvailability(),
-    unavailableSlots: [
-      { day: 'Friday', period: 1, reason: 'Industry Advisory Meeting' },
-      { day: 'Friday', period: 2, reason: 'Industry Advisory Meeting' }
-    ],
-    preferences: { preferredTime: 'morning', maxConsecutivePeriods: 2 }
+    unavailableSlots: [],
+    preferences: { preferredTime: 'any', maxConsecutivePeriods: 2 }
+  },
+  {
+    facultyId: 'FAC011',
+    name: 'Mr. Nithin R',
+    department: 'MCA',
+    designation: 'Assistant Professor',
+    email: 'nithinr@fisat.ac.in',
+    maxWeeklyHours: 14,
+    availability: defaultAvailability(),
+    unavailableSlots: [],
+    preferences: { preferredTime: 'afternoon', maxConsecutivePeriods: 2 }
   }
 ];
 

@@ -16,8 +16,8 @@ const TimeSlotSchema = new mongoose.Schema({
   period: {
     type: Number,
     required: [true, 'Period number is required'],
-    min: [1, 'Period must be between 1 and 6'],
-    max: [6, 'Period must be between 1 and 6']
+    min: [1, 'Period must be between 1 and 8'],
+    max: [8, 'Period must be between 1 and 8']
   },
   startTime: {
     type: String,

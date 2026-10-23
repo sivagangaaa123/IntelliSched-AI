@@ -34,6 +34,10 @@ const StudentGroupSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  electiveBucket: {
+    type: String,
+    default: null
+  },
   parentGroupId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'StudentGroup',

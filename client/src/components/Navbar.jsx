@@ -9,7 +9,7 @@ function Navbar({ activeTab, setActiveTab, onGenerate, isGenerating, timetableSt
           <div>
             <div className="fw-bold fs-5 leading-none">IntelliSched AI</div>
             <div className="text-muted text-uppercase" style={{ fontSize: '0.62rem', letterSpacing: '0.5px' }}>
-              Explainable MCA Timetable Optimizer
+              FISAT MCA Timetable Optimizer
             </div>
           </div>
         </a>

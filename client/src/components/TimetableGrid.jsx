@@ -3,13 +3,16 @@ import { generateTimetablePDF, printTimetable } from '../utils/pdfExport';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const PERIODS = [
-  { num: 1, time: '09:00 - 10:00' },
-  { num: 2, time: '10:00 - 11:00' },
-  { num: 3, time: '11:15 - 12:15' },
-  { num: 'LUNCH', time: '12:15 - 01:15' },
-  { num: 4, time: '01:15 - 02:15' },
-  { num: 5, time: '02:15 - 03:15' },
-  { num: 6, time: '03:15 - 04:15' },
+  { num: 1, label: 'Period 1', time: '08:00 - 08:50', isBreak: false },
+  { num: 2, label: 'Period 2', time: '08:50 - 09:40', isBreak: false },
+  { num: 'BREAK1', label: 'BREAK', time: '09:40 - 09:55', isBreak: true },
+  { num: 3, label: 'Period 3', time: '09:55 - 10:45', isBreak: false },
+  { num: 4, label: 'Period 4', time: '10:45 - 11:35', isBreak: false },
+  { num: 'BREAK2', label: 'BREAK', time: '11:35 - 11:50', isBreak: true },
+  { num: 5, label: 'Period 5', time: '11:50 - 12:40', isBreak: false },
+  { num: 6, label: 'Period 6', time: '12:40 - 01:30', isBreak: false },
+  { num: 'LUNCH', label: 'LUNCH', time: '01:30 - 02:00', isBreak: true },
+  { num: 7, label: 'Activity / P7', time: '02:00 - 03:30', isBreak: false },
 ];
 
 function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGroups = [] }) {
@@ -192,11 +195,11 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
         <table className="table table-bordered table-hover align-middle mb-0 text-center" style={{ tableLayout: 'fixed' }}>
           <thead className="table-dark text-nowrap">
             <tr>
-              <th style={{ width: '10%' }}>Day / Period</th>
+              <th style={{ width: '9%' }}>Day / Period</th>
               {PERIODS.map((p, idx) => (
-                <th key={idx} style={{ width: p.num === 'LUNCH' ? '8%' : '14%' }}>
-                  <div className="fw-bold">{p.num === 'LUNCH' ? 'LUNCH' : `Period ${p.num}`}</div>
-                  <div className="small fw-normal text-light opacity-75" style={{ fontSize: '0.72rem' }}>
+                <th key={idx} style={{ width: p.isBreak ? '4%' : '13%' }}>
+                  <div className="fw-bold">{p.label}</div>
+                  <div className="small fw-normal text-light opacity-75" style={{ fontSize: '0.68rem' }}>
                     {p.time}
                   </div>
                 </th>
@@ -211,10 +214,10 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
                 </td>
 
                 {PERIODS.map((p, pIdx) => {
-                  if (p.num === 'LUNCH') {
+                  if (p.isBreak) {
                     return (
                       <td key={pIdx} className="bg-light text-muted small fw-semibold text-center" style={{ letterSpacing: '2px', writingMode: 'vertical-lr', textOrientation: 'upright' }}>
-                        BREAK
+                        {p.label}
                       </td>
                     );
                   }

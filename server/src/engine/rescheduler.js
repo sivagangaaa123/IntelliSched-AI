@@ -97,6 +97,47 @@ class DynamicRescheduler {
       }
 
       if (!bestSlot) {
+        // Strategy 2: If the batch schedule has no free slots (100% full), find an available substitute faculty
+        let substituteFaculty = null;
+        for (const [candidateId, candidate] of this.facultyMap.entries()) {
+          if (candidateId === fId) continue;
+          // Check if candidate is already teaching at (day, period) in unaffectedGrid
+          const isBusy = unaffectedGrid.some(entry =>
+            getDocId(entry.faculty) === candidateId && entry.day === day && entry.period === period
+          );
+          if (isBusy) continue;
+
+          // Check candidate leave/unavailable slots
+          const isAvailable = !candidate.unavailableSlots?.some(
+            s => s.day === day && s.period === period
+          );
+          if (!isAvailable) continue;
+
+          substituteFaculty = candidate;
+          break;
+        }
+
+        if (substituteFaculty) {
+          const subEntry = {
+            ...affectedEntry,
+            faculty: substituteFaculty._id,
+            facultyName: substituteFaculty.name,
+            courseName: course.name || affectedEntry.courseName,
+            studentGroupName: studentGroup.name || affectedEntry.studentGroupName,
+            classroomName: affectedEntry.classroom?.name || 'Classroom'
+          };
+          unaffectedGrid.push(subEntry);
+
+          auditLogs.push({
+            changeType: 'Dynamic Reschedule',
+            triggerReason: reason,
+            originalSlot: `${day} Period ${period} (${faculty?.name || 'Faculty'})`,
+            newSlot: `${day} Period ${period} (Substituted by ${substituteFaculty.name})`,
+            justification: `Faculty ${faculty?.name || 'Teacher'} is on leave (${reason}) on ${day} Period ${period}. As ${studentGroup.name} has a fully utilized timetable, available faculty ${substituteFaculty.name} was assigned as substitute teacher for '${course.name || 'Course'}' to prevent class cancellation.`
+          });
+          continue;
+        }
+
         return {
           success: false,
           modified: false,

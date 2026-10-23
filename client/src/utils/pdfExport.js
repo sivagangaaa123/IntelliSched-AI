@@ -8,12 +8,13 @@ import autoTable from 'jspdf-autotable';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const PERIODS = [
-  { num: 1, time: '09:00-10:00' },
-  { num: 2, time: '10:00-11:00' },
-  { num: 3, time: '11:15-12:15' },
-  { num: 4, time: '01:15-02:15' },
-  { num: 5, time: '02:15-03:15' },
-  { num: 6, time: '03:15-04:15' },
+  { num: 1, time: '08:00-08:50' },
+  { num: 2, time: '08:50-09:40' },
+  { num: 3, time: '09:55-10:45' },
+  { num: 4, time: '10:45-11:35' },
+  { num: 5, time: '11:50-12:40' },
+  { num: 6, time: '12:40-01:30' },
+  { num: 7, time: '02:00-03:30' },
 ];
 
 // Color palette for course types
@@ -87,16 +88,16 @@ export function generateTimetablePDF(timetable, options = {}) {
   doc.rect(0, 0, pageWidth, 28, 'F');
 
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
+  doc.setFontSize(15);
   doc.setFont('helvetica', 'bold');
-  doc.text('IntelliSched AI', margin, 12);
+  doc.text('Federal Institute of Science and Technology (FISAT)', margin, 11);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('Explainable AI-Powered Department Timetable Optimizer', margin, 18);
+  doc.text('Department of Computer Applications — Master Timetable', margin, 17);
 
   doc.setFontSize(8);
-  doc.text('MCA Department | Academic Year 2026-2027', margin, 24);
+  doc.text('First Semester MCA (2026 Batch) & Third Semester MCA (2025 Batch)', margin, 23);
 
   // Right-side metadata
   doc.setFontSize(8);

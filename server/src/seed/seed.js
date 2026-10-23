@@ -73,6 +73,7 @@ const seedDatabase = async (closeConnection = true) => {
         studentCount: eg.studentCount,
         program: eg.program,
         isElectiveGroup: true,
+        electiveBucket: eg.electiveBucket || null,
         parentGroupId: groupMap[eg.parentGroupRef] || null
       }));
 

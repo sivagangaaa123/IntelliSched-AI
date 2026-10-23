@@ -58,7 +58,7 @@ function hasClassroomClash(schedule, classroomId, day, period) {
 
 // Check for student group clash at (day, period) in the current partial schedule
 // Note: Allows parallel scheduling for elective sub-groups that do not share students
-function hasStudentGroupClash(schedule, studentGroupId, isElectiveGroup, parentGroupId, day, period) {
+function hasStudentGroupClash(schedule, studentGroupId, isElectiveGroup, parentGroupId, day, period, electiveBucket) {
   const gId = extractId(studentGroupId);
   const pId = parentGroupId ? extractId(parentGroupId) : null;
 
@@ -68,6 +68,7 @@ function hasStudentGroupClash(schedule, studentGroupId, isElectiveGroup, parentG
     const entryGroupId = extractId(entry.studentGroup);
     const entryParentId = entry.parentGroupId ? extractId(entry.parentGroupId) : (entry.studentGroup?.parentGroupId ? extractId(entry.studentGroup.parentGroupId) : null);
     const entryIsElective = entry.isElectiveGroup ?? entry.studentGroup?.isElectiveGroup ?? false;
+    const entryBucket = entry.electiveBucket ?? entry.studentGroup?.electiveBucket ?? null;
 
     // 1. Direct same group conflict
     if (entryGroupId === gId) return true;
@@ -76,8 +77,11 @@ function hasStudentGroupClash(schedule, studentGroupId, isElectiveGroup, parentG
     if (pId && entryGroupId === pId) return true;
     if (entryParentId && entryParentId === gId) return true;
 
-    // 3. Both are elective sub-groups of the same parent: ALLOWED in parallel!
+    // 3. Both are elective sub-groups of the same parent: ALLOWED in parallel if in same bucket!
     if (isElectiveGroup && entryIsElective && pId && entryParentId && pId === entryParentId) {
+      if (electiveBucket && entryBucket) {
+        return electiveBucket !== entryBucket;
+      }
       return false; // Valid parallel elective!
     }
 
@@ -147,7 +151,7 @@ function validateHardConstraints({ course, faculty, studentGroup, classroom, tim
   }
 
   // 7. Student Group Clash Check
-  if (hasStudentGroupClash(currentSchedule, studentGroup._id, studentGroup.isElectiveGroup, studentGroup.parentGroupId, day, period)) {
+  if (hasStudentGroupClash(currentSchedule, studentGroup._id, studentGroup.isElectiveGroup, studentGroup.parentGroupId, day, period, studentGroup.electiveBucket)) {
     return {
       valid: false,
       constraint: 'studentGroupConflict',
@@ -195,12 +199,16 @@ function calculateScheduleMetrics(schedule, facultyList, groupList, config = {})
     });
   });
 
-  // 2. Calculate Student Group Gaps and Course Daily Distribution
-  groupList.forEach(group => {
+  // 2. Calculate Student Group Gaps (for primary student batches only)
+  groupList.filter(g => !g.isElectiveGroup).forEach(group => {
     const gId = group._id.toString();
     days.forEach(day => {
       const dayClasses = schedule
-        .filter(s => s.studentGroup.toString() === gId && s.day === day)
+        .filter(s => {
+          const entryGId = extractId(s.studentGroup);
+          const entryPId = s.parentGroupId ? extractId(s.parentGroupId) : (s.studentGroup?.parentGroupId ? extractId(s.studentGroup.parentGroupId) : null);
+          return entryGId === gId || entryPId === gId;
+        })
         .map(s => s.period)
         .sort((a, b) => a - b);
 
@@ -213,13 +221,13 @@ function calculateScheduleMetrics(schedule, facultyList, groupList, config = {})
     });
 
     // Penalize when the same theory course appears more than 2 times in one day for a group
-    const groupEntries = schedule.filter(s => s.studentGroup.toString() === gId);
+    const groupEntries = schedule.filter(s => extractId(s.studentGroup) === gId);
     days.forEach(day => {
       const courseCounts = {};
       groupEntries
         .filter(s => s.day === day)
         .forEach(s => {
-          const cId = s.course.toString();
+          const cId = extractId(s.course);
           courseCounts[cId] = (courseCounts[cId] || 0) + 1;
         });
 
@@ -230,7 +238,7 @@ function calculateScheduleMetrics(schedule, facultyList, groupList, config = {})
   });
 
   // Calculate composite soft score (0 - 100)
-  let rawScore = 100 - (facultyGaps * 2) - (studentGaps * 2) - distributionPenalties + Math.min(preferenceBonus, 15);
+  let rawScore = 100 - (facultyGaps * 0.5) - (studentGaps * 1) - distributionPenalties + Math.min(preferenceBonus, 15);
   const softScore = Math.max(0, Math.min(100, Math.round(rawScore)));
 
   return {

@@ -100,11 +100,11 @@ async function runTests() {
   const slotCount = await TimeSlot.countDocuments();
   const configCount = await ConstraintConfig.countDocuments();
 
-  assertEqual(facultyCount, 10, 'Faculty count = 10');
-  assertEqual(courseCount, 14, 'Course count = 14');
+  assertEqual(facultyCount, 11, 'Faculty count = 11');
+  assertEqual(courseCount, 21, 'Course count = 21');
   assertEqual(classroomCount, 7, 'Classroom count = 7');
-  assertEqual(groupCount, 5, 'Student Group count = 5');
-  assertEqual(slotCount, 30, 'Time Slot count = 30');
+  assertEqual(groupCount, 6, 'Student Group count = 6');
+  assertEqual(slotCount, 35, 'Time Slot count = 35');
   assertEqual(configCount, 1, 'Constraint Config count = 1');
 
   // ── Load all data for engine tests ──────────────────────────────────────────

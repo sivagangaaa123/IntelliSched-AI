@@ -15,7 +15,7 @@ const TimetableGridEntrySchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1,
-    max: 6
+    max: 8
   },
   course: {
     type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +40,10 @@ const TimetableGridEntrySchema = new mongoose.Schema({
   isElectiveGroup: {
     type: Boolean,
     default: false
+  },
+  electiveBucket: {
+    type: String,
+    default: null
   },
   parentGroupId: {
     type: mongoose.Schema.Types.ObjectId,

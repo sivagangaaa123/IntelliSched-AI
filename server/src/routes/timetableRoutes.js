@@ -19,7 +19,7 @@ const populateTimetable = (query) => {
     .populate('grid.course', 'courseId courseCode name courseType weeklyPeriods requiredRoomType semester')
     .populate('grid.faculty', 'facultyId name designation email department')
     .populate('grid.classroom', 'roomId name capacity type facilities')
-    .populate('grid.studentGroup', 'groupId name semester studentCount isElectiveGroup parentGroupId');
+    .populate('grid.studentGroup', 'groupId name semester studentCount isElectiveGroup electiveBucket parentGroupId');
 };
 
 // GET /api/timetable/active - Fetch current active timetable
@@ -112,6 +112,7 @@ router.post('/generate', protect, async (req, res) => {
         classroom: entry.classroom,
         studentGroup: entry.studentGroup,
         isElectiveGroup: entry.isElectiveGroup || false,
+        electiveBucket: entry.electiveBucket || null,
         parentGroupId: entry.parentGroupId || null
       })),
       metrics: result.metrics,
@@ -208,6 +209,7 @@ router.post('/reschedule', protect, async (req, res) => {
         classroom: entry.classroom._id || entry.classroom,
         studentGroup: entry.studentGroup._id || entry.studentGroup,
         isElectiveGroup: entry.isElectiveGroup || false,
+        electiveBucket: entry.electiveBucket || null,
         parentGroupId: entry.parentGroupId || null
       }));
 

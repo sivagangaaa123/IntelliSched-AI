@@ -41,7 +41,7 @@ const ClassroomSchema = new mongoose.Schema({
       period: {
         type: Number,
         min: 1,
-        max: 6,
+        max: 8,
         required: true
       },
       reason: {

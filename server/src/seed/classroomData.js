@@ -10,7 +10,7 @@ const classroomData = [
   {
     roomId: 'CR-102',
     name: 'MCA Lecture Hall 2',
-    capacity: 50,
+    capacity: 60,
     type: 'Classroom',
     facilities: ['Projector', 'Whiteboard'],
     unavailableSlots: []
