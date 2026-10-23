@@ -16,7 +16,7 @@ const PERIODS = [
 ];
 
 function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGroups = [] }) {
-  const [selectedSemester, setSelectedSemester] = useState('ALL');
+  const [selectedSemester, setSelectedSemester] = useState('3');
   const [selectedGroup, setSelectedGroup] = useState('ALL');
   const [selectedFaculty, setSelectedFaculty] = useState('ALL');
   const [selectedRoom, setSelectedRoom] = useState('ALL');
@@ -77,6 +77,41 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
 
   return (
     <div className="card shadow-sm border-0 bg-white p-3 mb-4">
+      {/* Quick Semester Switch Tabs */}
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-3 border-bottom">
+        <div className="d-flex align-items-center gap-2">
+          <span className="fw-bold text-dark me-1">
+            <i className="bi bi-mortarboard-fill text-primary me-1"></i> View Semester:
+          </span>
+          <div className="btn-group shadow-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-sm ${selectedSemester === '3' ? 'btn-primary fw-bold' : 'btn-outline-secondary'}`}
+              onClick={() => { setSelectedSemester('3'); setSelectedGroup('ALL'); }}
+            >
+              MCA Semester 3 (2025 Batch)
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${selectedSemester === '1' ? 'btn-primary fw-bold' : 'btn-outline-secondary'}`}
+              onClick={() => { setSelectedSemester('1'); setSelectedGroup('ALL'); }}
+            >
+              MCA Semester 1 (2026 Batch)
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${selectedSemester === 'ALL' ? 'btn-dark fw-bold' : 'btn-outline-secondary'}`}
+              onClick={() => setSelectedSemester('ALL')}
+            >
+              All Semesters (Master View)
+            </button>
+          </div>
+        </div>
+        <div className="text-muted small">
+          Active View: <strong className="text-primary">{selectedSemester === 'ALL' ? 'Combined Master Timetable' : `MCA Semester ${selectedSemester}`}</strong>
+        </div>
+      </div>
+
       {/* Controls & Filter Bar */}
       <div className="row g-2 align-items-center mb-3 pb-3 border-bottom">
         <div className="col-auto">
@@ -244,7 +279,7 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
                                 className="p-2 rounded text-start shadow-sm border"
                                 style={{
                                   backgroundColor: '#ffffff',
-                                  borderLeft: '4px solid var(--bs-primary)',
+                                  borderLeft: (course.semester === 1 || group.semester === 1) ? '4px solid #0284c7' : '4px solid #7c3aed',
                                   fontSize: '0.8rem'
                                 }}
                               >
@@ -252,9 +287,14 @@ function TimetableGrid({ timetable, facultyList = [], classrooms = [], studentGr
                                   <span className="fw-bold text-dark text-truncate" title={course.name}>
                                     {course.courseCode || 'CRS'}
                                   </span>
-                                  <span className={`badge ${getCourseBadgeColor(course.courseType)}`} style={{ fontSize: '0.65rem' }}>
-                                    {course.courseType || 'Theory'}
-                                  </span>
+                                  <div className="d-flex gap-1">
+                                    <span className={`badge ${course.semester === 1 ? 'bg-info text-dark' : 'bg-primary text-white'}`} style={{ fontSize: '0.62rem' }}>
+                                      S{course.semester || group.semester || 3}
+                                    </span>
+                                    <span className={`badge ${getCourseBadgeColor(course.courseType)}`} style={{ fontSize: '0.62rem' }}>
+                                      {course.courseType || 'Theory'}
+                                    </span>
+                                  </div>
                                 </div>
 
                                 <div className="text-secondary fw-semibold text-truncate small" title={course.name}>

@@ -204,6 +204,7 @@ class CSPSolver {
             studentGroup: variable.studentGroup._id,
             studentGroupName: variable.studentGroup.name,
             isElectiveGroup: variable.studentGroup.isElectiveGroup || false,
+            electiveBucket: variable.studentGroup.electiveBucket || null,
             parentGroupId: variable.studentGroup.parentGroupId || null
           };
 
