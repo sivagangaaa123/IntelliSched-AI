@@ -33,7 +33,7 @@ const CourseSchema = new mongoose.Schema({
   },
   courseType: {
     type: String,
-    enum: ['Theory', 'Lab', 'Elective', 'Project', 'Seminar'],
+    enum: ['Theory', 'Lab', 'Elective', 'Project', 'Seminar', 'Activity'],
     default: 'Theory',
     required: true
   },

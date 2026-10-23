@@ -1,6 +1,6 @@
 const courseData = [
   // =========================================================================
-  // --- First Semester MCA (2026 Batch) — Core Academic Curriculum ---
+  // --- First Semester MCA (2026 Batch) — 35 Full Weekly Periods ---
   // =========================================================================
   {
     courseId: '26CAPC7001',
@@ -79,9 +79,42 @@ const courseData = [
     studentGroupRef: 'MCA-S1',
     requiredRoomType: 'Computer Lab'
   },
+  {
+    courseId: '26CAP-PLC',
+    courseCode: '26CAP-PLC',
+    name: 'Placement Training',
+    semester: 1,
+    weeklyPeriods: 1,
+    courseType: 'Activity',
+    facultyRef: 'FAC003', // Ms. Anju L (AL)
+    studentGroupRef: 'MCA-S1',
+    requiredRoomType: 'Classroom'
+  },
+  {
+    courseId: '26CAP-ADDON',
+    courseCode: '26CAP-ADDON',
+    name: 'Add-On Course',
+    semester: 1,
+    weeklyPeriods: 1,
+    courseType: 'Theory',
+    facultyRef: 'FAC011', // Mr. Nithin R (NR)
+    studentGroupRef: 'MCA-S1',
+    requiredRoomType: 'Classroom'
+  },
+  {
+    courseId: '26CAP-LIB',
+    courseCode: '26CAP-LIB',
+    name: 'Library & Research Methodology',
+    semester: 1,
+    weeklyPeriods: 1,
+    courseType: 'Activity',
+    facultyRef: 'FAC011', // Mr. Nithin R (NR)
+    studentGroupRef: 'MCA-S1',
+    requiredRoomType: 'Classroom'
+  },
 
   // =========================================================================
-  // --- Third Semester MCA (2025 Batch) — Core Academic Curriculum ---
+  // --- Third Semester MCA (2025 Batch) — 35 Full Weekly Periods ---
   // =========================================================================
   {
     courseId: '20MCA201',
@@ -154,7 +187,7 @@ const courseData = [
     requiredRoomType: 'Computer Lab'
   },
 
-  // --- Labs & Project ---
+  // --- Labs & Projects ---
   {
     courseId: '20MCA241',
     courseCode: '20MCA241',
@@ -187,6 +220,28 @@ const courseData = [
     facultyRef: 'FAC010', // Dr. Deepa Mary Mathews (DMM)
     studentGroupRef: 'MCA-S3',
     requiredRoomType: 'Computer Lab'
+  },
+  {
+    courseId: '20MCA-PLC',
+    courseCode: '20MCA-PLC',
+    name: 'Placement Training',
+    semester: 3,
+    weeklyPeriods: 2,
+    courseType: 'Activity',
+    facultyRef: 'FAC002', // Ms. Senu Abi (SA)
+    studentGroupRef: 'MCA-S3',
+    requiredRoomType: 'Classroom'
+  },
+  {
+    courseId: '20MCA-ADDON',
+    courseCode: '20MCA-ADDON',
+    name: 'Add-On Course',
+    semester: 3,
+    weeklyPeriods: 1,
+    courseType: 'Theory',
+    facultyRef: 'FAC002', // Ms. Senu Abi (SA)
+    studentGroupRef: 'MCA-S3',
+    requiredRoomType: 'Classroom'
   }
 ];
 
