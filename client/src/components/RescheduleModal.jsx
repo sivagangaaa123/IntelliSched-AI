@@ -93,7 +93,7 @@ function RescheduleModal({ isOpen, onClose, facultyList = [], onRescheduled }) {
                     onChange={e => setPeriod(e.target.value)}
                     required
                   >
-                    {[1, 2, 3, 4, 5, 6].map(p => (
+                    {[1, 2, 3, 4, 5, 6, 7].map(p => (
                       <option key={p} value={p}>Period {p}</option>
                     ))}
                   </select>

@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const StudentGroup = require('../models/StudentGroup');
 
@@ -30,9 +31,11 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const query = id.startsWith('MCA') ? { groupId: id.toUpperCase() } : { _id: id };
-
-    const group = await StudentGroup.findOne(query)
+    const conditions = [{ groupId: id.toString().toUpperCase() }];
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      conditions.push({ _id: id });
+    }
+    const group = await StudentGroup.findOne({ $or: conditions })
       .populate('parentGroupId', 'groupId name studentCount');
 
     if (!group) {

@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Classroom = require('../models/Classroom');
 
@@ -27,9 +28,13 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const query = (id.includes('-') || id.startsWith('CR') || id.startsWith('LAB') || id.startsWith('SEM') || id.startsWith('PROJ'))
-      ? { roomId: id.toUpperCase() }
-      : { _id: id };
+    const conditions = [
+      { roomId: id.toString().toUpperCase() }
+    ];
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      conditions.push({ _id: id });
+    }
+    const query = { $or: conditions };
 
     const classroom = await Classroom.findOne(query);
 

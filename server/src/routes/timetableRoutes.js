@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 
 const Faculty = require('../models/Faculty');
@@ -165,9 +166,11 @@ router.post('/reschedule', protect, async (req, res) => {
       });
     }
 
-    const facultyDoc = await Faculty.findOne(
-      facultyId.startsWith('FAC') ? { facultyId: facultyId.toUpperCase() } : { _id: facultyId }
-    );
+    const facultyConditions = [{ facultyId: facultyId.toString().toUpperCase() }];
+    if (mongoose.Types.ObjectId.isValid(facultyId)) {
+      facultyConditions.push({ _id: facultyId });
+    }
+    const facultyDoc = await Faculty.findOne({ $or: facultyConditions });
 
     if (!facultyDoc) {
       return res.status(404).json({
@@ -239,13 +242,22 @@ router.post('/explain-slot', async (req, res) => {
   try {
     const { courseId, classroomId, day, period } = req.body;
 
-    const courseQuery = (courseId.startsWith('CRS') || courseId.startsWith('MCA'))
-      ? { $or: [{ courseId: courseId.toUpperCase() }, { courseCode: courseId.toUpperCase() }] }
-      : { _id: courseId };
+    const courseConditions = [
+      { courseId: courseId.toString().toUpperCase() },
+      { courseCode: courseId.toString().toUpperCase() }
+    ];
+    if (mongoose.Types.ObjectId.isValid(courseId)) {
+      courseConditions.push({ _id: courseId });
+    }
+    const courseQuery = { $or: courseConditions };
 
-    const roomQuery = (classroomId.includes('-') || classroomId.startsWith('CR') || classroomId.startsWith('LAB') || classroomId.startsWith('SEM') || classroomId.startsWith('PROJ'))
-      ? { roomId: classroomId.toUpperCase() }
-      : { _id: classroomId };
+    const roomConditions = [
+      { roomId: classroomId.toString().toUpperCase() }
+    ];
+    if (mongoose.Types.ObjectId.isValid(classroomId)) {
+      roomConditions.push({ _id: classroomId });
+    }
+    const roomQuery = { $or: roomConditions };
 
     const [course, classroom, activeTimetable] = await Promise.all([
       Course.findOne(courseQuery).populate('faculty').populate('studentGroup'),

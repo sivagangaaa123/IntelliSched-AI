@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Faculty = require('../models/Faculty');
 
@@ -24,8 +25,11 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const query = id.startsWith('FAC') ? { facultyId: id.toUpperCase() } : { _id: id };
-    const faculty = await Faculty.findOne(query);
+    const conditions = [{ facultyId: id.toString().toUpperCase() }];
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      conditions.push({ _id: id });
+    }
+    const faculty = await Faculty.findOne({ $or: conditions });
 
     if (!faculty) {
       return res.status(404).json({

@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Course = require('../models/Course');
 
@@ -34,9 +35,14 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const query = (id.startsWith('CRS') || id.startsWith('MCA')) 
-      ? { $or: [{ courseId: id.toUpperCase() }, { courseCode: id.toUpperCase() }] } 
-      : { _id: id };
+    const conditions = [
+      { courseId: id.toString().toUpperCase() },
+      { courseCode: id.toString().toUpperCase() }
+    ];
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      conditions.push({ _id: id });
+    }
+    const query = { $or: conditions };
 
     const course = await Course.findOne(query)
       .populate('faculty', 'facultyId name designation email')
