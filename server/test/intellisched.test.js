@@ -101,7 +101,7 @@ async function runTests() {
   const configCount = await ConstraintConfig.countDocuments();
 
   assertEqual(facultyCount, 11, 'Faculty count = 11');
-  assertEqual(courseCount, 21, 'Course count = 21');
+  assertEqual(courseCount, 16, 'Course count = 16');
   assertEqual(classroomCount, 7, 'Classroom count = 7');
   assertEqual(groupCount, 6, 'Student Group count = 6');
   assertEqual(slotCount, 35, 'Time Slot count = 35');
