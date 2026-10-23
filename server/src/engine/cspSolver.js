@@ -23,6 +23,7 @@ class CSPSolver {
     this.facultyMap = new Map(facultyList.map(f => [f._id.toString(), f]));
     this.classroomMap = new Map(classrooms.map(c => [c._id.toString(), c]));
     this.groupMap = new Map(studentGroups.map(g => [g._id.toString(), g]));
+    this.labCourseIds = new Set(courses.filter(c => c.courseType === 'Lab').map(c => (c._id || c).toString()));
   }
 
   /**
@@ -202,19 +203,20 @@ class CSPSolver {
         scoreA -= aSameCourseDayCount * 100;
         scoreB -= bSameCourseDayCount * 100;
 
-        // 3. Balance student group daily lab load: penalize placing more than 2 lab hours on the same day
+        // 3. Balance student group daily lab load: penalize placing more than 2 lab periods (1 block) on the same day
+        const targetGroupId = (variable.studentGroup.parentGroupId || variable.studentGroup._id).toString();
         const aGroupLabCount = currentSchedule.filter(
-          s => s.studentGroup.toString() === variable.studentGroup._id.toString() &&
+          s => (s.parentGroupId || s.studentGroup).toString() === targetGroupId &&
                s.day === a.timeSlot.day &&
-               s.classroom.toString() === a.classroom._id.toString()
+               this.labCourseIds.has(s.course.toString())
         ).length;
         const bGroupLabCount = currentSchedule.filter(
-          s => s.studentGroup.toString() === variable.studentGroup._id.toString() &&
+          s => (s.parentGroupId || s.studentGroup).toString() === targetGroupId &&
                s.day === b.timeSlot.day &&
-               s.classroom.toString() === b.classroom._id.toString()
+               this.labCourseIds.has(s.course.toString())
         ).length;
-        scoreA -= aGroupLabCount * 25;
-        scoreB -= bGroupLabCount * 25;
+        scoreA -= aGroupLabCount * 40;
+        scoreB -= bGroupLabCount * 40;
 
         // 4. Faculty preference
         if (variable.faculty.preferences?.preferredTime === 'morning') {
@@ -243,7 +245,7 @@ class CSPSolver {
         if (b.timeSlot.period >= 4) scoreB += 5;
       }
 
-      // Day distribution: penalize placing more than 2 sessions of same course on same day
+      // Day distribution: penalize clustering multiple sessions of same course on the same day
       const aDayCount = currentSchedule.filter(
         s => s.course.toString() === variable.course._id.toString() && s.day === a.timeSlot.day
       ).length;
@@ -251,8 +253,8 @@ class CSPSolver {
         s => s.course.toString() === variable.course._id.toString() && s.day === b.timeSlot.day
       ).length;
 
-      scoreA -= aDayCount * 10;
-      scoreB -= bDayCount * 10;
+      scoreA -= aDayCount * 40;
+      scoreB -= bDayCount * 40;
 
       return scoreB - scoreA;
     });
